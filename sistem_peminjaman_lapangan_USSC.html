@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Sistem Peminjaman Lapangan USSC</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f4f6f8; }
+    h1 { text-align:center; }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    th { background: #eee; }
+    input, select, button {
+      padding: 6px;
+      margin: 4px;
+    }
+    .success { color: green; }
+    .error { color: red; }
+  </style>
+</head>
+
+<body>
+<div class="container">
+
+  <h1>Sistem Peminjaman Lapangan USSC</h1>
+
+  <h3>Login User</h3>
+  <label>Username:</label>
+  <input type="text" id="username">
+  <label>Password:</label>
+  <input type="password" id="password">
+  <button onclick="login()">Login</button>
+  <p id="loginStatus"></p>
+
+  <hr>
+
+  <div id="app" style="display:none;">
+
+    <h3>Form Peminjaman Lapangan</h3>
+
+    <label>Nama Peminjam:</label>
+    <input type="text" id="nama">
+
+    <label>Lapangan:</label>
+    <select id="lapangan">
+      <option>Futsal</option>
+      <option>Basket</option>
+      <option>Badminton</option>
+    </select><br>
+
+    <label>Tanggal:</label>
+    <input type="date" id="tanggal">
+
+    <label>Jam:</label>
+    <input type="time" id="jam">
+
+    <button onclick="ajukan()">Ajukan</button>
+    <p id="pesan"></p>
+
+    <h3>Jadwal Peminjaman</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Nama Peminjam</th>
+          <th>Lapangan</th>
+          <th>Tanggal</th>
+          <th>Jam</th>
+        </tr>
+      </thead>
+      <tbody id="jadwal"></tbody>
+    </table>
+
+  </div>
+</div>
+
+<script>
+  let dataPeminjaman = [];
+  let currentUser = null;
+
+  function login() {
+    const user = document.getElementById("username").value;
+    const pass = document.getElementById("password").value;
+    const status = document.getElementById("loginStatus");
+
+    if (user === "user" && pass === "1234") {
+      currentUser = user;
+      document.getElementById("app").style.display = "block";
+      status.textContent = "Login berhasil";
+      status.className = "success";
+    } else {
+      status.textContent = "Username atau password salah";
+      status.className = "error";
+    }
+  }
+
+  function ajukan() {
+    const nama = document.getElementById("nama").value;
+    const lapangan = document.getElementById("lapangan").value;
+    const tanggal = document.getElementById("tanggal").value;
+    const jam = document.getElementById("jam").value;
+    const pesan = document.getElementById("pesan");
+
+    if (!nama || !tanggal || !jam) {
+      pesan.textContent = "Data harus lengkap";
+      pesan.className = "error";
+      return;
+    }
+
+    const bentrok = dataPeminjaman.find(d =>
+      d.lapangan === lapangan &&
+      d.tanggal === tanggal &&
+      d.jam === jam
+    );
+
+    if (bentrok) {
+      pesan.textContent = "Jadwal bentrok! Pilih waktu lain.";
+      pesan.className = "error";
+      return;
+    }
+
+    dataPeminjaman.push({
+      username: currentUser,
+      namaPeminjam: nama,
+      lapangan,
+      tanggal,
+      jam
+    });
+
+    tampilkan();
+    pesan.textContent = "Peminjaman berhasil diajukan";
+    pesan.className = "success";
+  }
+
+  function tampilkan() {
+    const tbody = document.getElementById("jadwal");
+    tbody.innerHTML = "";
+
+    dataPeminjaman.forEach(d => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${d.namaPeminjam}</td>
+          <td>${d.lapangan}</td>
+          <td>${d.tanggal}</td>
+          <td>${d.jam}</td>
+        </tr>
+      `;
+    });
+  }
+</script>
+
+</body>
+</html>
